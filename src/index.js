@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const fs = require('fs').promises;
 const generateRandomToken = require('./function/generateRandomToken');
+const { validateLogin } = require('./function/isValidEmail');
 
 const app = express();
 app.use(express.json());
@@ -44,21 +45,23 @@ const lendoArquivo = async () => {
       const talkers = await lendoArquivo();
       const talker = talkers.find(({ id }) => id === Number(req.params.id));
       if (!talker) {
-        return res.status(404).json({ message: "Pessoa palestrante não encontrada" });
+        return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
       }
       res.status(200).json(talker);
     } catch (err) {
       res.status(500).send({ message: err.message });
     }
   });
-
   app.post('/login', (req, res) => {
     try {
       const { email, password } = req.body;
-  
+      const validationError = validateLogin(email, password);
+      if (validationError) {
+        return res.status(400).json({ message: validationError });
+      }
       const token = generateRandomToken();
       res.status(200).json({ token });
     } catch (err) {
-      res.status(500).send({ message: "Erro interno do servidor" });
+      res.status(500).send({ message: 'Erro interno do servidor' });
     }
   });
