@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const fs = require('fs').promises;
+const generateRandomToken = require('./function/generateRandomToken');
 
 const app = express();
 app.use(express.json());
@@ -48,5 +49,16 @@ const lendoArquivo = async () => {
       res.status(200).json(talker);
     } catch (err) {
       res.status(500).send({ message: err.message });
+    }
+  });
+
+  app.post('/login', (req, res) => {
+    try {
+      const { email, password } = req.body;
+  
+      const token = generateRandomToken();
+      res.status(200).json({ token });
+    } catch (err) {
+      res.status(500).send({ message: "Erro interno do servidor" });
     }
   });
