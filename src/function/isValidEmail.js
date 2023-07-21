@@ -1,21 +1,28 @@
-function isValidEmail(email) {
+/* function isValidEmail(email) {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 }
+*/
 
-const validateLogin = (email, password) => {
-  if (!email || !password) {
-    return 'Email e senha são obrigatórios';
+function validateLogin(email, password) {
+  if (!email) {
+    return 'O campo "email" é obrigatório';
   }
 
-  if (!isValidEmail(email)) {
-    return 'Email inválido';
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return 'O "email" deve ter o formato "email@email.com"';
+  }
+
+  if (!password) {
+    return 'O campo "password" é obrigatório';
   }
 
   if (password.length < 6) {
-    return 'A senha deve ter pelo menos 6 caracteres';
+    return 'O "password" deve ter pelo menos 6 caracteres';
   }
-  return null;
-};
 
-module.exports = { isValidEmail, validateLogin };
+  return null; // Retorna null se a validação passar
+}
+
+module.exports = { validateLogin };
