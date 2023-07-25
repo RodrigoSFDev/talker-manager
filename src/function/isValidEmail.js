@@ -22,7 +22,7 @@ function validateLogin(email, password) {
     return 'O "password" deve ter pelo menos 6 caracteres';
   }
 
-  return null; // Retorna null se a validação passar
+  return null; 
 }
 
 module.exports = { validateLogin };
