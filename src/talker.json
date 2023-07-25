@@ -27,6 +27,15 @@
     }
   },
   {
+    "name": "Marcos Costa",
+    "age": 24,
+    "id": 4,
+    "talk": {
+      "watchedAt": "30/10/2020",
+      "rate": 5
+    }
+  },
+  {
     "name": "Henrique dos Santos",
     "age": 44,
     "id": 5,

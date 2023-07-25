@@ -34,6 +34,20 @@ const lendoArquivo = async () => {
   }
 };
 
+app.post('/login', (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const validationError = validateLogin(email, password);
+    if (validationError) {
+      return res.status(400).json({ message: validationError });
+    }
+    const token = generateRandomToken();
+    res.status(200).json({ token });
+  } catch (err) {
+    res.status(500).send({ message: 'Erro interno do servidor' });
+  }
+});
+
 app.get('/talker', async (req, res) => {
   try {
     const talker = await lendoArquivo();
@@ -55,19 +69,6 @@ app.get('/talker/:id', async (req, res) => {
     res.status(500).send({ message: err.message });
   }
 });
-app.post('/login', (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const validationError = validateLogin(email, password);
-    if (validationError) {
-      return res.status(400).json({ message: validationError });
-    }
-    const token = generateRandomToken();
-    res.status(200).json({ token });
-  } catch (err) {
-    res.status(500).send({ message: 'Erro interno do servidor' });
-  }
-});
 
 app.post('/talker', validateAuthorizationHeader, validateRequestBody, async (req, res) => {
     try {
@@ -83,18 +84,44 @@ app.post('/talker', validateAuthorizationHeader, validateRequestBody, async (req
     }
 });
 
-app.put('/talker/:id', validateAuthorizationHeader, async (req, res) => {
+app.get('/talker/search', validateAuthorizationHeader, async (req, res) => {
+  try {
+    const searchTerm = req.query.q;
+    if (!searchTerm || searchTerm.trim() === '') {
+      const allTalkers = await lendoArquivo();
+      return res.status(200).json(allTalkers);
+    }
+    const currentTalkers = await lendoArquivo();
+    const filteredTalkers = currentTalkers.filter((talker) =>
+      talker.name.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    if (filteredTalkers.length === 0) {
+      return res.status(200).json(filteredTalkers); // Retorna um array vazio se não houver resultados
+    }
+
+    res.status(200).json(filteredTalkers);
+  } catch (err) {
+    res.status(400).json({ message: 'Erro interno do servidor' });
+  }
+});
+
+app.put('/talker/:id', validateRequestBody, validateAuthorizationHeader, async (req, res) => {
   try {
     const { id } = req.params;
     const { name, age, talk } = req.body;
-    const movies = await lendoArquivo();
-    const index = movies.findIndex((element) => element.id === Number(id));
-    movies[index] = { id: Number(id), name, age, talk };
-    const updatedMovies = JSON.stringify(movies, null, 2);
-    await fs.writeFile(arquivo, updatedMovies);
-    res.status(200).json(movies[index]);
+    const currentTalkers = await lendoArquivo();
+    const talkerToUpdate = currentTalkers.find((talker) => talker.id === Number(id));
+    if (!talkerToUpdate) {
+      return res.status(404).json({ message: 'Pessoa palestrante não encontrada' });
+    }
+    talkerToUpdate.name = name;
+    talkerToUpdate.age = age;
+    talkerToUpdate.talk = talk;
+    await fs.writeFile(arquivo, JSON.stringify(currentTalkers, null, 2));
+
+    res.status(200).json(talkerToUpdate);
   } catch (err) {
-    res.status(500).send({ message: err.message });
+    res.status(400).json({ message: 'Erro interno do servidor' });
   }
 });
 

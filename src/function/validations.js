@@ -31,17 +31,17 @@ function validateTalk(talk) {
   if (!watchedAt || typeof watchedAt !== 'string' || watchedAt.trim() === '') {
     return 'O campo "watchedAt" é obrigatório';
   }
-  const watchedAtRegex = /^\d{2}\/\d{2}\/\d{4}$/;
+  const watchedAtRegex = /^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/i;
   if (!watchedAtRegex.test(watchedAt)) {
     return 'O campo "watchedAt" deve ter o formato "dd/mm/aaaa"';
   }
-  if (!rate) {
+  if (rate === undefined) {
     return 'O campo "rate" é obrigatório';
   }
-  if (rate === 0) {
+  if (Number(rate) === 0) {
     return 'O campo "rate" deve ser um número inteiro entre 1 e 5';
   }
-  if (typeof rate !== 'number' || !Number.isInteger(rate) || rate < 1 || rate > 5) {
+  if (typeof rate !== 'number' || !Number.isInteger(rate) || Number(rate) < 1 || Number(rate) > 5) {
     return 'O campo "rate" deve ser um número inteiro entre 1 e 5';
   }
   return null;
