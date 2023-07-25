@@ -22,28 +22,42 @@ function validateAge(age) {
   return null;
 }
 
-// eslint-disable-next-line max-lines-per-function, complexity, sonarjs/cognitive-complexity
-function validateTalk(talk) {
-  if (!talk) {
-    return 'O campo "talk" é obrigatório';
-  }
-  const { watchedAt, rate } = talk;
+function validateWatchedAt(watchedAt) {
   if (!watchedAt || typeof watchedAt !== 'string' || watchedAt.trim() === '') {
     return 'O campo "watchedAt" é obrigatório';
   }
+
   const watchedAtRegex = /^([0-2][0-9]|(3)[0-1])(\/)(((0)[0-9])|((1)[0-2]))(\/)\d{4}$/i;
   if (!watchedAtRegex.test(watchedAt)) {
     return 'O campo "watchedAt" deve ter o formato "dd/mm/aaaa"';
   }
+
+  return null;
+}
+
+function validateRate(rate) {
+  if (typeof rate !== 'number' || !Number.isInteger(rate) || rate < 1 || rate > 5) {
+    return 'O campo "rate" deve ser um número inteiro entre 1 e 5';
+  }
+  return null;
+}
+
+function validateTalk(talk) {
+  if (!talk) {
+    return 'O campo "talk" é obrigatório';
+  }
+
+  const { watchedAt, rate } = talk;
   if (rate === undefined) {
     return 'O campo "rate" é obrigatório';
   }
-  if (Number(rate) === 0) {
-    return 'O campo "rate" deve ser um número inteiro entre 1 e 5';
-  }
-  if (typeof rate !== 'number' || !Number.isInteger(rate) || Number(rate) < 1 || Number(rate) > 5) {
-    return 'O campo "rate" deve ser um número inteiro entre 1 e 5';
-  }
+
+  const watchedAtError = validateWatchedAt(watchedAt);
+  if (watchedAtError) return watchedAtError;
+
+  const rateError = validateRate(rate);
+  if (rateError) return rateError;
+
   return null;
 }
 
