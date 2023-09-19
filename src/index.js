@@ -56,29 +56,26 @@ app.get('/talker', async (req, res) => {
     res.status(500).send({ message: err.message });
   }
 });
-/* function isValidDate(date) {
-  const dateRegex = /^([0-2][0-9]|(3)[0-1])\/(((0)[0-9])|((1)[0-2]))\/\d{4}$/;
-  return dateRegex.test(date);
-} */
-/* function filterTalker(searchTerm, rate, date, talker) {
-  const isMatchingSearchTerm = !searchTerm || talker.name.toLowerCase().includes(searchTerm.toLowerCase());
-  const isMatchingRate = !rate || (talker.talk.rate === Number(rate) && rate >= 1 && rate <= 5);
-  const isMatchingDate = !date || (isValidDate(date) && talker.talk.watchedAt === date);
-  return isMatchingSearchTerm && isMatchingRate && isMatchingDate;
-}
-app.get('/talker/search', validateAuthorizationHeader, async (req, res) => {
+app.get('/talker/search', validateAuthorizationHeader, (req, res) => {
   try {
     const searchTerm = req.query.q;
-    const { rate } = req.query;
-    const { date } = req.query;
-    const currentTalkers = await lendoArquivo();
-    const filteredTalkers = currentTalkers.filter(filterTalker.bind(null, searchTerm, rate, date));
-    
+    if (!searchTerm || searchTerm.trim() === '') {
+      return res.status(400).json({ message: 'Termo de busca inválido' });
+    }
+
+    const currentTalkers = lendoArquivo();
+    const filteredTalkers = currentTalkers.filter((talker) =>
+      talker.name.toLowerCase().includes(searchTerm.toLowerCase()));
+
+    if (filteredTalkers.length === 0) {
+      return res.status(200).json(filteredTalkers);
+    }
+
     res.status(200).json(filteredTalkers);
   } catch (err) {
     res.status(400).json({ message: 'Erro interno do servidor' });
   }
-}); */
+});
 
 app.get('/talker/:id', async (req, res) => {
   try {
